@@ -8,9 +8,7 @@ import Debug.Trace (trace)
 #else
 import IOExts      (trace)
 #endif
-
-#if defined(__HASKELL98__)
-import Char        (isAlphaNum)
+Char        (isAlphaNum)
 #else
 import Data.Char   (isAlphaNum)
 #endif

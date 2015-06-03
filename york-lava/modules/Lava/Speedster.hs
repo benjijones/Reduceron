@@ -4,7 +4,9 @@ module Lava.Speedster
 
 import Lava.Bit
 import Lava.Binary
-import System
+import Lava.Vhdl
+import Flite.Dependency
+--import System
 
 vhdlGumpth :: String
 vhdlGumpth = unlines $

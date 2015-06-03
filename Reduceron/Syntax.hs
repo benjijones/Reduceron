@@ -1,4 +1,4 @@
-module Syntax where
+module Reduceron.Syntax where
 
 type Id = Int
 

@@ -3,7 +3,7 @@
 -- Colin Runciman, May 2010.
 ----------------------------------------------------------------------------
 
-module Main where
+module H2F.Main where
 
 import IO
 import System

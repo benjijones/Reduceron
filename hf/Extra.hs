@@ -69,10 +69,8 @@ snub (x:xs) = x:snub (filter (/=x) xs)
 pair   x y   = (x,y)
 triple x y z = (x,y,z)
 
-#if !defined(__HASKELL98__)
 isNothing Nothing = True
 isNothing _       = False
-#endif
 
 dropJust (Just v) = v
 

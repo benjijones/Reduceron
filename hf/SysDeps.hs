@@ -1,4 +1,6 @@
 {-# OPTIONS -fno-warn-deprecations #-}
+{-# LANGUAGE CPP #-}
+
 module SysDeps (trace, isAlphaNum) where
 
 #if defined(__NHC__) || defined(__HBC__)
@@ -8,7 +10,9 @@ import Debug.Trace (trace)
 #else
 import IOExts      (trace)
 #endif
-Char        (isAlphaNum)
+
+#if defined(__HASKELL98__)
+import Char        (isAlphaNum)
 #else
 import Data.Char   (isAlphaNum)
 #endif

@@ -1,6 +1,6 @@
 module Flite.Parsec.Flite (main) where
 
-import Paths_flite (version)
+-- import Paths_flite (version)
 import Data.Version (showVersion)
 import Flite.Syntax
 import Flite.Parsec.Parse

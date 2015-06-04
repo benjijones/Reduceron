@@ -15,14 +15,14 @@ import GHC-Flite.Translate (translate)
 import Flite.Pretty
 
 main :: IO ()
-main = do 
+main = do
     core <- runGhc (Just libdir) (coreModule "test/test_main.hs")
     print . translate $ cm_binds core
     return ()
-    
+
 -- | Sets up a session in the GhcMonad and
 -- compiles the given file to a CoreModule
-coreModule :: (GhcMonad m) => String -> m CoreModule 
+coreModule :: (GhcMonad m) => String -> m CoreModule
 coreModule fileName = do
     dflags <- getSessionDynFlags
     setSessionDynFlags dflags

@@ -1,35 +1,43 @@
+{-# LANGUAGE DeriveFunctor #-}
+
 module Flite.ParseLib where
 
-import Data.Char
 
-infixr 3 <|>
-infixl 4 <*>
+import Data.Char
+import Data.Tuple
+import Control.Applicative
+
 infixl 5 <|
 infixl 6 |>
 
-type Parser a = String -> [(String, a)]
+newtype Parser a = Parser { unParser :: (String -> [(String, a)]) }
+  deriving (Functor)
 
-pure :: a -> Parser a
-pure a = \s -> [(s, a)]
+instance Applicative Parser where
+  pure a = Parser $ \s -> [(s, a)]
+  f <*> a = Parser $ \s -> [(s1, g b) | (s0, g) <- unParser f s, (s1, b) <- unParser a s0]
 
-(<*>) :: Parser (a -> b) -> Parser a -> Parser b
-f <*> a = \s -> [(s1, g b) | (s0, g) <- f s, (s1, b) <- a s0]
-
+instance Alternative Parser where
+  empty = Parser $ (\s -> [])
+  p <|> q = Parser $ (\s -> let p1 = unParser p s in
+                                if null p1 
+                                then p1
+                                else unParser q s)
+  
 (|>) :: Parser a -> Parser b -> Parser b
 a |> b = pure (\a b -> b) <*> a <*> b
 
 (<|) :: Parser a -> Parser b -> Parser a
 a <| b = pure (\a b -> a) <*> a <*> b
 
-(<|>) :: Parser a -> Parser a -> Parser a
-a <|> b = \s -> take 1 (a s ++ b s)
-
 guarded :: (a -> Bool) -> Parser a -> Parser a
-guarded f p = \s -> [(s', a) | (s', a) <- p s, f a]
+guarded f p = Parser $ \s -> [(s', a) | (s', a) <- unParser p s, f a]
 
 sat :: (Char -> Bool) -> Parser Char
-sat f "" = []
-sat f (c:s) = [(s, c) | f c]
+sat f = Parser satisfy 
+  where
+      satisfy "" = []
+      satisfy (c:s) = [(s, c) | f c]
 
 char :: Char -> Parser Char
 char c = sat (== c)
@@ -49,9 +57,6 @@ lower = sat isLower
 
 upper :: Parser Char
 upper = sat isUpper
-
-many :: Parser a -> Parser [a]
-many p = many1 p <|> pure []
 
 many1 :: Parser a -> Parser [a]
 many1 p = pure (:) <*> p <*> many p
@@ -79,18 +84,18 @@ integer :: Parser Int
 integer = natural <|> pure negate <*> (char '-' |> natural)
 
 strLit :: Parser String
-strLit s@('"':_) = map swap (lex s)
-  where swap (a, b) = (b, a)
-strLit _ = []
+strLit = Parser $ strLit'
+  where strLit' s@('"':_) = map swap (lex s)
+        strLit _ = []
 
 charLit :: Parser String
-charLit s@('\'':_) = map swap (lex s)
-  where swap (a, b) = (b, a)
-charLit _ = []
+charLit = Parser $ charLit'
+  where charLit' s@('\'':_) = map swap (lex s)
+        charLit' _ = []
 
 parse :: Parser a -> String -> a
 parse p s =
-  case p s of
+  case unParser p s of
     []        -> error "Parse error"
     [("", x)] -> x
     [(s, x)]  -> error "Parse error"

@@ -7,6 +7,7 @@ module Flite.Dependency
   , callGroups   -- :: [Decl] -> [[Decl]]
   , letGroups    -- :: [Binding] -> [[Binding]]
   , joinGraph    -- :: DepGraph -> (Id, [Id]) -> ((Id, [Id]), Bool)
+  , comps        -- :: DepGraph -> [Id] -> [[Id]]
   ) where
 
 import Flite.Syntax
